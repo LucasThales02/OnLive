@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, redirect, Response
 from supabase import create_client
 import os
 
@@ -12,7 +12,7 @@ supabase = create_client(
 
 @app.route("/")
 def home():
-    return "API ONLINE"
+    return "API ONLINE ✅"
 
 
 @app.route("/player_api.php")
@@ -22,7 +22,7 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-    # Validar cliente
+    # Validação do cliente
     cliente = (
         supabase.table("clientes")
         .select("*")
@@ -33,7 +33,6 @@ def player_api():
     )
 
     if not cliente.data:
-
         return jsonify({
             "user_info": {
                 "auth": 0,
@@ -43,7 +42,7 @@ def player_api():
 
     cliente = cliente.data[0]
 
-    # Login
+    # Login Xtream
     if not action:
 
         return jsonify({
@@ -59,7 +58,7 @@ def player_api():
             }
         })
 
-    # Categorias Live TV
+    # Categorias LIVE
     if action == "get_live_categories":
 
         categorias = (
@@ -81,7 +80,7 @@ def player_api():
 
         return jsonify(retorno)
 
-    # Canais Live TV
+    # Streams LIVE
     if action == "get_live_streams":
 
         streams = (
@@ -97,11 +96,14 @@ def player_api():
         for s in streams.data:
 
             retorno.append({
-                "stream_id": s["id"],
+                "num": s["id"],
                 "name": s["nome"],
-                "stream_icon": s["logo"] or "",
+                "stream_type": "live",
+                "stream_id": s["id"],
+                "stream_icon": s.get("logo") or "",
                 "category_id": str(s["categoria_id"]),
-                "stream_type": "live"
+                "tv_archive": 0,
+                "direct_source": ""
             })
 
         return jsonify(retorno)
@@ -109,13 +111,75 @@ def player_api():
     return jsonify([])
 
 
-@app.route("/live/<username>/<password>/<int:stream_id>.ts")
-def live_stream(username, password, stream_id):
+@app.route("/get.php")
+def get_m3u():
 
-    # Validar cliente
+    username = request.args.get("username")
+    password = request.args.get("password")
+
     cliente = (
         supabase.table("clientes")
         .select("*")
+        .eq("usuario", username)
+        .eq("senha", password)
+        .eq("ativo", True)
+        .execute()
+    )
+
+    if not cliente.data:
+        return "Acesso negado", 403
+
+    categorias = (
+        supabase.table("categorias")
+        .select("*")
+        .execute()
+    )
+
+    mapa_categorias = {}
+
+    for c in categorias.data:
+        mapa_categorias[c["id"]] = c["nome"]
+
+    streams = (
+        supabase.table("streams")
+        .select("*")
+        .eq("tipo", "LIVE")
+        .eq("ativo", True)
+        .execute()
+    )
+
+    m3u = "#EXTM3U\n\n"
+
+    for s in streams.data:
+
+        categoria = mapa_categorias.get(
+            s["categoria_id"],
+            "OUTROS"
+        )
+
+        m3u += (
+            f'#EXTINF:-1 '
+            f'tvg-id="" '
+            f'tvg-name="{s["nome"]}" '
+            f'tvg-logo="{s.get("logo") or ""}" '
+            f'group-title="{categoria}",'
+            f'{s["nome"]}\n'
+            f'https://onlive-yi4x.onrender.com/live/'
+            f'{username}/{password}/{s["id"]}.ts\n'
+        )
+
+    return Response(
+        m3u,
+        mimetype="application/x-mpegURL"
+    )
+
+
+@app.route("/live/<username>/<password>/<int:stream_id>.ts")
+def live_stream(username, password, stream_id):
+
+    cliente = (
+        supabase.table("clientes")
+        .select("id")
         .eq("usuario", username)
         .eq("senha", password)
         .eq("ativo", True)
@@ -137,10 +201,14 @@ def live_stream(username, password, stream_id):
     if not stream.data:
         return "Canal não encontrado", 404
 
-    url_stream = stream.data[0]["url_stream"]
-
-    return redirect(url_stream)
+    return redirect(
+        stream.data[0]["url_stream"],
+        code=302
+    )
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.run(
+        host="0.0.0.0",
+        port=10000
+    )
