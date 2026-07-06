@@ -12,7 +12,7 @@ supabase = create_client(
 
 @app.route("/")
 def home():
-    return "API ONLINE ✅"
+    return "API ONLINE"
 
 
 @app.route("/player_api.php")
@@ -22,6 +22,7 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
+    # Validar cliente
     cliente = (
         supabase.table("clientes")
         .select("*")
@@ -41,7 +42,7 @@ def player_api():
 
     cliente = cliente.data[0]
 
-    # LOGIN XTREAM
+    # Login
     if not action:
 
         return jsonify({
@@ -63,12 +64,11 @@ def player_api():
                 "url": "onlive-yi4x.onrender.com",
                 "port": "443",
                 "https_port": "443",
-                "server_protocol": "https",
-                "timezone": "America/Sao_Paulo"
+                "server_protocol": "https"
             }
         })
 
-    # CATEGORIAS LIVE
+    # LIVE CATEGORIES
     if action == "get_live_categories":
 
         categorias = (
@@ -79,18 +79,15 @@ def player_api():
             .execute()
         )
 
-        retorno = []
-
-        for c in categorias.data:
-
-            retorno.append({
+        return jsonify([
+            {
                 "category_id": str(c["id"]),
                 "category_name": c["nome"]
-            })
+            }
+            for c in categorias.data
+        ])
 
-        return jsonify(retorno)
-
-    # STREAMS LIVE
+    # LIVE STREAMS
     if action == "get_live_streams":
 
         streams = (
@@ -101,28 +98,20 @@ def player_api():
             .execute()
         )
 
-        retorno = []
-
-        for s in streams.data:
-
-            retorno.append({
+        return jsonify([
+            {
                 "num": s["id"],
                 "name": s["nome"],
                 "stream_type": "live",
                 "stream_id": s["id"],
                 "stream_icon": s.get("logo", "") or "",
-                "epg_channel_id": "",
-                "added": "",
                 "category_id": str(s["categoria_id"]),
-                "custom_sid": "",
-                "tv_archive": 0,
-                "direct_source": s["url_stream"],
-                "tv_archive_duration": 0
-            })
+                "direct_source": s["url_stream"]
+            }
+            for s in streams.data
+        ])
 
-        return jsonify(retorno)
-
-    # CATEGORIAS MOVIES
+    # MOVIE CATEGORIES
     if action == "get_vod_categories":
 
         categorias = (
@@ -133,15 +122,13 @@ def player_api():
             .execute()
         )
 
-        retorno = []
-
-        for c in categorias.data:
-            retorno.append({
+        return jsonify([
+            {
                 "category_id": str(c["id"]),
                 "category_name": c["nome"]
-            })
-
-        return jsonify(retorno)
+            }
+            for c in categorias.data
+        ])
 
     # MOVIES
     if action == "get_vod_streams":
@@ -154,38 +141,36 @@ def player_api():
             .execute()
         )
 
-        retorno = []
-
-        for s in streams.data:
-            retorno.append({
+        return jsonify([
+            {
                 "stream_id": s["id"],
                 "name": s["nome"],
                 "stream_icon": s.get("capa", "") or "",
                 "category_id": str(s["categoria_id"]),
                 "container_extension": "mp4",
                 "direct_source": s["url_stream"]
-            })
+            }
+            for s in streams.data
+        ])
 
-        return jsonify(retorno)
-
-    # CATEGORIAS SERIES
+    # SERIES CATEGORIES
     if action == "get_series_categories":
-    
+
         categorias = (
             supabase.table("categorias")
             .select("*")
+            .eq("tipo", "SERIES")
+            .eq("ativo", True)
             .execute()
         )
 
-    return jsonify(categorias.data)
-
-        for c in categorias.data:
-            retorno.append({
+        return jsonify([
+            {
                 "category_id": str(c["id"]),
                 "category_name": c["nome"]
-            })
-
-        return jsonify(retorno)
+            }
+            for c in categorias.data
+        ])
 
     # SERIES
     if action == "get_series":
@@ -198,19 +183,18 @@ def player_api():
             .execute()
         )
 
-        retorno = []
-
-        for s in streams.data:
-            retorno.append({
+        return jsonify([
+            {
                 "series_id": s["id"],
                 "name": s["nome"],
                 "cover": s.get("capa", "") or "",
                 "category_id": str(s["categoria_id"])
-            })
-
-        return jsonify(retorno)
+            }
+            for s in streams.data
+        ])
 
     return jsonify([])
+
 
 @app.route("/get.php")
 def get_m3u():
@@ -236,10 +220,10 @@ def get_m3u():
         .execute()
     )
 
-    mapa_categorias = {}
-
-    for c in categorias.data:
-        mapa_categorias[c["id"]] = c["nome"]
+    mapa_categorias = {
+        c["id"]: c["nome"]
+        for c in categorias.data
+    }
 
     streams = (
         supabase.table("streams")
@@ -259,9 +243,7 @@ def get_m3u():
         )
 
         m3u += (
-            f'#EXTINF:-1 '
-            f'tvg-id="" '
-            f'tvg-name="{s["nome"]}" '
+            f'#EXTINF:-1 tvg-name="{s["nome"]}" '
             f'tvg-logo="{s.get("logo", "")}" '
             f'group-title="{categoria}",'
             f'{s["nome"]}\n'
