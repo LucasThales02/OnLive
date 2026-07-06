@@ -187,7 +187,7 @@ def get_m3u():
 
     return Response(
         m3u,
-        mimetype="application/x-mpegURL"
+        mimetype="text/plain"
     )
 
 
