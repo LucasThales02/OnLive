@@ -1,6 +1,13 @@
 from flask import Flask, request, jsonify
+from supabase import create_client
+import os
 
 app = Flask(__name__)
+
+supabase = create_client(
+    os.environ["SUPABASE_URL"],
+    os.environ["SUPABASE_KEY"]
+)
 
 @app.route("/")
 def home():
@@ -30,16 +37,24 @@ def player_api():
     # Categorias Live TV
     if action == "get_live_categories":
 
-        return jsonify([
-            {
-                "category_id": "1",
-                "category_name": "ABERTA"
-            },
-            {
-                "category_id": "2",
-                "category_name": "ESPORTES"
-            }
-        ])
+        categorias = (
+            supabase.table("categorias")
+            .select("*")
+            .eq("tipo", "LIVE")
+            .eq("ativo", True)
+            .execute()
+        )
+
+        retorno = []
+
+        for c in categorias.data:
+
+            retorno.append({
+                "category_id": str(c["id"]),
+                "category_name": c["nome"]
+            })
+
+        return jsonify(retorno)
 
     # Canais Live TV
     if action == "get_live_streams":
