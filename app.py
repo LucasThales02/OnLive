@@ -174,8 +174,6 @@ def player_api():
         categorias = (
             supabase.table("categorias")
             .select("*")
-            .eq("tipo", "SERIES")
-            .eq("ativo", True)
             .execute()
         )
 
