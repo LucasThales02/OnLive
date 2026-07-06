@@ -170,14 +170,14 @@ def player_api():
 
     # CATEGORIAS SERIES
     if action == "get_series_categories":
-
+    
         categorias = (
             supabase.table("categorias")
             .select("*")
             .execute()
         )
 
-        retorno = []
+    return jsonify(categorias.data)
 
         for c in categorias.data:
             retorno.append({
