@@ -43,20 +43,31 @@ def player_api():
     cliente = cliente.data[0]
 
     # Login Xtream
-    if not action:
+if not action:
 
-        return jsonify({
-            "user_info": {
-                "auth": 1,
-                "status": "Active",
-                "username": cliente["usuario"],
-                "password": cliente["senha"],
-                "active_cons": "1",
-                "max_connections": str(
-                    cliente.get("max_connections", 1)
-                )
-            }
-        })
+    return jsonify({
+        "user_info": {
+            "auth": 1,
+            "status": "Active",
+            "username": cliente["usuario"],
+            "password": cliente["senha"],
+            "active_cons": "1",
+            "max_connections": str(
+                cliente.get("max_connections", 1)
+            ),
+            "allowed_output_formats": [
+                "ts",
+                "m3u8"
+            ]
+        },
+        "server_info": {
+            "url": "onlive-yi4x.onrender.com",
+            "port": "443",
+            "https_port": "443",
+            "server_protocol": "https",
+            "timezone": "America/Sao_Paulo"
+        }
+    })
 
     # Categorias LIVE
     if action == "get_live_categories":
@@ -100,10 +111,14 @@ def player_api():
                 "name": s["nome"],
                 "stream_type": "live",
                 "stream_id": s["id"],
-                "stream_icon": s.get("logo") or "",
+                "stream_icon": s["logo"] or "",
+                "epg_channel_id": "",
+                "added": "",
                 "category_id": str(s["categoria_id"]),
+                "custom_sid": "",
                 "tv_archive": 0,
-                "direct_source": ""
+                "direct_source": "",
+                "tv_archive_duration": 0
             })
 
         return jsonify(retorno)
