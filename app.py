@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, Response
+from flask import Flask, request, jsonify, Response
 from supabase import create_client
 import os
 
@@ -22,7 +22,6 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-    # Validar cliente
     cliente = (
         supabase.table("clientes")
         .select("*")
@@ -42,15 +41,15 @@ def player_api():
 
     cliente = cliente.data[0]
 
-    # Login Xtream
+    # LOGIN XTREAM
     if not action:
 
         return jsonify({
             "user_info": {
                 "auth": 1,
                 "status": "Active",
-                "username": cliente.get("usuario"),
-                "password": cliente.get("senha"),
+                "username": cliente["usuario"],
+                "password": cliente["senha"],
                 "active_cons": "1",
                 "max_connections": str(
                     cliente.get("max_connections", 1)
@@ -69,7 +68,7 @@ def player_api():
             }
         })
 
-    # Categorias LIVE
+    # CATEGORIAS LIVE
     if action == "get_live_categories":
 
         categorias = (
@@ -83,6 +82,7 @@ def player_api():
         retorno = []
 
         for c in categorias.data:
+
             retorno.append({
                 "category_id": str(c["id"]),
                 "category_name": c["nome"]
@@ -90,7 +90,7 @@ def player_api():
 
         return jsonify(retorno)
 
-    # Streams LIVE
+    # STREAMS LIVE
     if action == "get_live_streams":
 
         streams = (
@@ -178,46 +178,12 @@ def get_m3u():
             f'tvg-logo="{s.get("logo", "")}" '
             f'group-title="{categoria}",'
             f'{s["nome"]}\n'
-            f'https://onlive-yi4x.onrender.com/live/'
-            f'{username}/{password}/{s["id"]}.ts\n'
+            f'{s["url_stream"]}\n'
         )
 
     return Response(
         m3u,
-        mimetype="text/plain"
-    )
-
-
-@app.route("/live/<username>/<password>/<int:stream_id>.ts")
-def live_stream(username, password, stream_id):
-
-    cliente = (
-        supabase.table("clientes")
-        .select("id")
-        .eq("usuario", username)
-        .eq("senha", password)
-        .eq("ativo", True)
-        .execute()
-    )
-
-    if not cliente.data:
-        return "Acesso negado", 403
-
-    stream = (
-        supabase.table("streams")
-        .select("*")
-        .eq("id", stream_id)
-        .eq("tipo", "LIVE")
-        .eq("ativo", True)
-        .execute()
-    )
-
-    if not stream.data:
-        return "Canal não encontrado", 404
-
-    return redirect(
-        stream.data[0]["url_stream"],
-        code=302
+        mimetype="application/x-mpegURL"
     )
 
 
