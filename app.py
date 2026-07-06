@@ -9,9 +9,11 @@ supabase = create_client(
     os.environ["SUPABASE_KEY"]
 )
 
+
 @app.route("/")
 def home():
     return "API ONLINE"
+
 
 @app.route("/player_api.php")
 def player_api():
@@ -34,25 +36,6 @@ def player_api():
             }
         })
 
-@app.route("/live/<username>/<password>/<int:stream_id>.ts")
-def live_stream(username, password, stream_id):
-
-        stream = (
-            supabase.table("streams")
-            .select("*")
-            .eq("id", stream_id)
-            .eq("tipo", "LIVE")
-            .eq("ativo", True)
-            .execute()
-        )
-    
-        if not stream.data:
-            return "Canal não encontrado", 404
-    
-        url_stream = stream.data[0]["url_stream"]
-    
-        return redirect(url_stream)
-    
     # Categorias Live TV
     if action == "get_live_categories":
 
@@ -101,3 +84,27 @@ def live_stream(username, password, stream_id):
         return jsonify(retorno)
 
     return jsonify([])
+
+
+@app.route("/live/<username>/<password>/<int:stream_id>.ts")
+def live_stream(username, password, stream_id):
+
+    stream = (
+        supabase.table("streams")
+        .select("*")
+        .eq("id", stream_id)
+        .eq("tipo", "LIVE")
+        .eq("ativo", True)
+        .execute()
+    )
+
+    if not stream.data:
+        return "Canal não encontrado", 404
+
+    url_stream = stream.data[0]["url_stream"]
+
+    return redirect(url_stream)
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
