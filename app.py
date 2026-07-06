@@ -22,19 +22,43 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-    # Login
-    if not action:
+# Validar cliente
 
-        return jsonify({
-            "user_info": {
-                "auth": 1,
-                "status": "Active",
-                "username": username,
-                "password": password,
-                "active_cons": "1",
-                "max_connections": "1"
-            }
-        })
+cliente = (
+    supabase.table("clientes")
+    .select("*")
+    .eq("usuario", username)
+    .eq("senha", password)
+    .eq("ativo", True)
+    .execute()
+)
+
+if not cliente.data:
+
+    return jsonify({
+        "user_info": {
+            "auth": 0,
+            "status": "Disabled"
+        }
+    })
+
+cliente = cliente.data[0]
+
+# Login
+if not action:
+
+    return jsonify({
+        "user_info": {
+            "auth": 1,
+            "status": "Active",
+            "username": cliente["usuario"],
+            "password": cliente["senha"],
+            "active_cons": "1",
+            "max_connections": str(
+                cliente.get("max_connections", 1)
+            )
+        }
+    })
 
     # Categorias Live TV
     if action == "get_live_categories":
