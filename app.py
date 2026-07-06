@@ -116,7 +116,7 @@ def player_api():
                 "category_id": str(s["categoria_id"]),
                 "custom_sid": "",
                 "tv_archive": 0,
-                "direct_source": s["url_stream"]
+                "direct_source": s["url_stream"],
                 "tv_archive_duration": 0
             })
 
