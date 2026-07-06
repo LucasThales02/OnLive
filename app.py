@@ -49,8 +49,8 @@ def player_api():
             "user_info": {
                 "auth": 1,
                 "status": "Active",
-                "username": cliente["usuario"],
-                "password": cliente["senha"],
+                "username": cliente.get("usuario"),
+                "password": cliente.get("senha"),
                 "active_cons": "1",
                 "max_connections": str(
                     cliente.get("max_connections", 1)
@@ -90,7 +90,7 @@ def player_api():
 
         return jsonify(retorno)
 
-    # Canais LIVE
+    # Streams LIVE
     if action == "get_live_streams":
 
         streams = (
@@ -110,7 +110,7 @@ def player_api():
                 "name": s["nome"],
                 "stream_type": "live",
                 "stream_id": s["id"],
-                "stream_icon": s["logo"] or "",
+                "stream_icon": s.get("logo", "") or "",
                 "epg_channel_id": "",
                 "added": "",
                 "category_id": str(s["categoria_id"]),
@@ -119,7 +119,7 @@ def player_api():
                 "direct_source": (
                     f"https://onlive-yi4x.onrender.com/live/"
                     f"{username}/{password}/{s['id']}.ts"
-                )
+                ),
                 "tv_archive_duration": 0
             })
 
@@ -178,7 +178,7 @@ def get_m3u():
             f'#EXTINF:-1 '
             f'tvg-id="" '
             f'tvg-name="{s["nome"]}" '
-            f'tvg-logo="{s["logo"] or ""}" '
+            f'tvg-logo="{s.get("logo", "")}" '
             f'group-title="{categoria}",'
             f'{s["nome"]}\n'
             f'https://onlive-yi4x.onrender.com/live/'
