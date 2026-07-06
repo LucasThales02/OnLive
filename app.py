@@ -20,7 +20,7 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-    # Login sem action
+    # Login
     if not action:
 
         return jsonify({
@@ -59,14 +59,26 @@ def player_api():
     # Canais Live TV
     if action == "get_live_streams":
 
-        return jsonify([
-            {
-                "stream_id": 1,
-                "name": "Globo SP",
-                "stream_icon": "",
-                "category_id": "1",
+        streams = (
+            supabase.table("streams")
+            .select("*")
+            .eq("tipo", "LIVE")
+            .eq("ativo", True)
+            .execute()
+        )
+
+        retorno = []
+
+        for s in streams.data:
+
+            retorno.append({
+                "stream_id": s["id"],
+                "name": s["nome"],
+                "stream_icon": s["logo"] or "",
+                "category_id": str(s["categoria_id"]),
                 "stream_type": "live"
-            }
-        ])
+            })
+
+        return jsonify(retorno)
 
     return jsonify([])
