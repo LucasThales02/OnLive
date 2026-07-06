@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 from supabase import create_client
 import os
 
@@ -34,6 +34,25 @@ def player_api():
             }
         })
 
+@app.route("/live/<username>/<password>/<int:stream_id>.ts")
+def live_stream(username, password, stream_id):
+
+        stream = (
+            supabase.table("streams")
+            .select("*")
+            .eq("id", stream_id)
+            .eq("tipo", "LIVE")
+            .eq("ativo", True)
+            .execute()
+        )
+    
+        if not stream.data:
+            return "Canal não encontrado", 404
+    
+        url_stream = stream.data[0]["url_stream"]
+    
+        return redirect(url_stream)
+    
     # Categorias Live TV
     if action == "get_live_categories":
 
