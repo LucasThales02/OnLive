@@ -121,6 +121,91 @@ def player_api():
             })
 
         return jsonify(retorno)
+        if action == "get_vod_categories":
+
+            categorias = (
+                supabase.table("categorias")
+                .select("*")
+                .eq("tipo", "MOVIE")
+                .eq("ativo", True)
+                .execute()
+            )
+        
+            retorno = []
+        
+            for c in categorias.data:
+                retorno.append({
+                    "category_id": str(c["id"]),
+                    "category_name": c["nome"]
+                })
+    
+        return jsonify(retorno)
+
+        if action == "get_vod_streams":
+    
+        streams = (
+            supabase.table("streams")
+            .select("*")
+            .eq("tipo", "MOVIE")
+            .eq("ativo", True)
+            .execute()
+        )
+    
+        retorno = []
+    
+        for s in streams.data:
+            retorno.append({
+                "stream_id": s["id"],
+                "name": s["nome"],
+                "stream_icon": s.get("capa", "") or "",
+                "category_id": str(s["categoria_id"]),
+                "container_extension": "mp4",
+                "direct_source": s["url_stream"]
+            })
+    
+        return jsonify(retorno)
+
+        if action == "get_series_categories":
+
+    categorias = (
+        supabase.table("categorias")
+        .select("*")
+        .eq("tipo", "SERIES")
+        .eq("ativo", True)
+        .execute()
+    )
+
+    retorno = []
+
+    for c in categorias.data:
+        retorno.append({
+            "category_id": str(c["id"]),
+            "category_name": c["nome"]
+        })
+
+    return jsonify(retorno)
+
+    if action == "get_series":
+
+    streams = (
+        supabase.table("streams")
+        .select("*")
+        .eq("tipo", "SERIES")
+        .eq("ativo", True)
+        .execute()
+    )
+
+    retorno = []
+
+    for s in streams.data:
+        retorno.append({
+            "series_id": s["id"],
+            "name": s["nome"],
+            "cover": s.get("capa", "") or "",
+            "category_id": str(s["categoria_id"])
+        })
+
+    return jsonify(retorno)
 
     return jsonify([])
 
