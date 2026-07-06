@@ -116,7 +116,10 @@ def player_api():
                 "category_id": str(s["categoria_id"]),
                 "custom_sid": "",
                 "tv_archive": 0,
-                "direct_source": "",
+                "direct_source": (
+                    f"https://onlive-yi4x.onrender.com/live/"
+                    f"{username}/{password}/{s['id']}.ts"
+                )
                 "tv_archive_duration": 0
             })
 
