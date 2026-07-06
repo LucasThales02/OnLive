@@ -50,7 +50,7 @@ def player_api():
                 "name": "Globo SP",
                 "stream_icon": "",
                 "category_id": "1",
-                "stream_type": "live'
+                "stream_type": "live"
             }
         ])
 
