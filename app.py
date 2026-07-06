@@ -22,7 +22,7 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-    # Validação do cliente
+    # Validar cliente
     cliente = (
         supabase.table("clientes")
         .select("*")
@@ -43,31 +43,31 @@ def player_api():
     cliente = cliente.data[0]
 
     # Login Xtream
-if not action:
+    if not action:
 
-    return jsonify({
-        "user_info": {
-            "auth": 1,
-            "status": "Active",
-            "username": cliente["usuario"],
-            "password": cliente["senha"],
-            "active_cons": "1",
-            "max_connections": str(
-                cliente.get("max_connections", 1)
-            ),
-            "allowed_output_formats": [
-                "ts",
-                "m3u8"
-            ]
-        },
-        "server_info": {
-            "url": "onlive-yi4x.onrender.com",
-            "port": "443",
-            "https_port": "443",
-            "server_protocol": "https",
-            "timezone": "America/Sao_Paulo"
-        }
-    })
+        return jsonify({
+            "user_info": {
+                "auth": 1,
+                "status": "Active",
+                "username": cliente["usuario"],
+                "password": cliente["senha"],
+                "active_cons": "1",
+                "max_connections": str(
+                    cliente.get("max_connections", 1)
+                ),
+                "allowed_output_formats": [
+                    "ts",
+                    "m3u8"
+                ]
+            },
+            "server_info": {
+                "url": "onlive-yi4x.onrender.com",
+                "port": "443",
+                "https_port": "443",
+                "server_protocol": "https",
+                "timezone": "America/Sao_Paulo"
+            }
+        })
 
     # Categorias LIVE
     if action == "get_live_categories":
@@ -83,7 +83,6 @@ if not action:
         retorno = []
 
         for c in categorias.data:
-
             retorno.append({
                 "category_id": str(c["id"]),
                 "category_name": c["nome"]
@@ -91,7 +90,7 @@ if not action:
 
         return jsonify(retorno)
 
-    # Streams LIVE
+    # Canais LIVE
     if action == "get_live_streams":
 
         streams = (
@@ -176,7 +175,7 @@ def get_m3u():
             f'#EXTINF:-1 '
             f'tvg-id="" '
             f'tvg-name="{s["nome"]}" '
-            f'tvg-logo="{s.get("logo") or ""}" '
+            f'tvg-logo="{s["logo"] or ""}" '
             f'group-title="{categoria}",'
             f'{s["nome"]}\n'
             f'https://onlive-yi4x.onrender.com/live/'
