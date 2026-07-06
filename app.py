@@ -22,43 +22,42 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-# Validar cliente
+    # Validar cliente
+    cliente = (
+        supabase.table("clientes")
+        .select("*")
+        .eq("usuario", username)
+        .eq("senha", password)
+        .eq("ativo", True)
+        .execute()
+    )
 
-cliente = (
-    supabase.table("clientes")
-    .select("*")
-    .eq("usuario", username)
-    .eq("senha", password)
-    .eq("ativo", True)
-    .execute()
-)
+    if not cliente.data:
 
-if not cliente.data:
+        return jsonify({
+            "user_info": {
+                "auth": 0,
+                "status": "Disabled"
+            }
+        })
 
-    return jsonify({
-        "user_info": {
-            "auth": 0,
-            "status": "Disabled"
-        }
-    })
+    cliente = cliente.data[0]
 
-cliente = cliente.data[0]
+    # Login
+    if not action:
 
-# Login
-if not action:
-
-    return jsonify({
-        "user_info": {
-            "auth": 1,
-            "status": "Active",
-            "username": cliente["usuario"],
-            "password": cliente["senha"],
-            "active_cons": "1",
-            "max_connections": str(
-                cliente.get("max_connections", 1)
-            )
-        }
-    })
+        return jsonify({
+            "user_info": {
+                "auth": 1,
+                "status": "Active",
+                "username": cliente["usuario"],
+                "password": cliente["senha"],
+                "active_cons": "1",
+                "max_connections": str(
+                    cliente.get("max_connections", 1)
+                )
+            }
+        })
 
     # Categorias Live TV
     if action == "get_live_categories":
@@ -112,6 +111,19 @@ if not action:
 
 @app.route("/live/<username>/<password>/<int:stream_id>.ts")
 def live_stream(username, password, stream_id):
+
+    # Validar cliente
+    cliente = (
+        supabase.table("clientes")
+        .select("*")
+        .eq("usuario", username)
+        .eq("senha", password)
+        .eq("ativo", True)
+        .execute()
+    )
+
+    if not cliente.data:
+        return "Acesso negado", 403
 
     stream = (
         supabase.table("streams")
