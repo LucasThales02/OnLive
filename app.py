@@ -41,6 +41,10 @@ def player_api():
 
     cliente = cliente.data[0]
 
+    @app.route("/panel_api.php")
+    def panel_api():
+    return player_api()
+
     # LOGIN
     if not action:
 
