@@ -163,25 +163,7 @@ def player_api():
         )
     
         return jsonify(categorias.data)
-"""
-    if action == "get_series_categories":
 
-        categorias = (
-            supabase.table("categorias")
-            .select("*")
-            .eq("tipo", "SERIES")
-            .eq("ativo", True)
-            .execute()
-        )
-
-        return jsonify([
-            {
-                "category_id": str(c["id"]),
-                "category_name": c["nome"]
-            }
-            for c in categorias.data
-        ])
-"""
     # SERIES
     if action == "get_series":
 
