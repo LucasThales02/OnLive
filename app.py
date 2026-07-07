@@ -22,7 +22,6 @@ def player_api():
     password = request.args.get("password")
     action = request.args.get("action")
 
-    # Validar cliente
     cliente = (
         supabase.table("clientes")
         .select("*")
@@ -42,7 +41,7 @@ def player_api():
 
     cliente = cliente.data[0]
 
-    # Login
+    # LOGIN
     if not action:
 
         return jsonify({
@@ -154,7 +153,7 @@ def player_api():
         ])
 
     # SERIES CATEGORIES
-   if action == "get_series_categories":
+    if action == "get_series_categories":
 
         categorias = (
             supabase.table("categorias")
@@ -185,16 +184,14 @@ def player_api():
 
         return jsonify([
             {
-
-            "series_id": s["id"],
-            "name": s["nome"],
-            "cover": s.get("capa", "") or "",
-            "category_id": str(s["categoria_id"])
-
+                "series_id": s["id"],
+                "name": s["nome"],
+                "cover": s.get("capa", "") or "",
+                "category_id": str(s["categoria_id"])
             }
             for s in streams.data
         ])
-        
+
     return jsonify([])
 
 
@@ -245,7 +242,8 @@ def get_m3u():
         )
 
         m3u += (
-            f'#EXTINF:-1 tvg-name="{s["nome"]}" '
+            f'#EXTINF:-1 '
+            f'tvg-name="{s["nome"]}" '
             f'tvg-logo="{s.get("logo", "")}" '
             f'group-title="{categoria}",'
             f'{s["nome"]}\n'
