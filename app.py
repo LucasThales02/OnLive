@@ -50,7 +50,11 @@ def player_api():
                 "status": "Active",
                 "username": cliente["usuario"],
                 "password": cliente["senha"],
+                "message": "",
+                "is_trial": "0",
                 "active_cons": "1",
+                "created_at": "0",
+                "exp_date": "0",
                 "max_connections": str(
                     cliente.get("max_connections", 1)
                 ),
@@ -63,10 +67,13 @@ def player_api():
                 "url": "onlive-yi4x.onrender.com",
                 "port": "443",
                 "https_port": "443",
-                "server_protocol": "https"
+                "server_protocol": "https",
+                "rtmp_port": "443",
+                "timezone": "America/Sao_Paulo",
+                "timestamp_now": "0"
             }
-        })
-
+    })
+    
     # LIVE CATEGORIES
     if action == "get_live_categories":
 
