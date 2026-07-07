@@ -173,7 +173,7 @@ def player_api():
         ])
 
     # SERIES
-    if action == "get_series_streams":
+    if action == "get_series":
 
         streams = (
             supabase.table("streams")
