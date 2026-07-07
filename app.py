@@ -42,11 +42,11 @@ def player_api():
     cliente = cliente.data[0]
 
     # LOGIN
-    if action == "":
+    if not action:
 
         return jsonify({
             "user_info": {
-                "auth": 1,
+                "auth": "1",
                 "status": "Active",
                 "username": cliente["usuario"],
                 "password": cliente["senha"],
@@ -204,7 +204,10 @@ def player_api():
 @app.route("/panel_api.php")
 def panel_api():
     return player_api()
-
+    
+@app.route("/api.php")
+def api():
+    return player_api()
 
 @app.route("/get.php")
 def get_m3u():
