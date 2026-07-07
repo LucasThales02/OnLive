@@ -153,6 +153,17 @@ def player_api():
         ])
 
     # SERIES CATEGORIES
+# SERIES CATEGORIES
+    if action == "get_series_categories":
+    
+        categorias = (
+            supabase.table("categorias")
+            .select("*")
+            .execute()
+        )
+    
+        return jsonify(categorias.data)
+"""
     if action == "get_series_categories":
 
         categorias = (
@@ -170,7 +181,7 @@ def player_api():
             }
             for c in categorias.data
         ])
-
+"""
     # SERIES
     if action == "get_series":
 
