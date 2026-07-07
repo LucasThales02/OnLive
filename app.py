@@ -154,17 +154,16 @@ def player_api():
         ])
 
     # SERIES CATEGORIES
-    if action == "get_VOD-serie_categories":
+    if action == "get_series_categories":
     
         categorias = (
             supabase.table("categorias")
             .select("*")
+            .eq("tipo", "SERIES")
+            .eq("ativo", True)
             .execute()
         )
     
-        return jsonify(categorias.data)
-
-
         return jsonify([
             {
                 "category_id": str(c["id"]),
@@ -174,7 +173,7 @@ def player_api():
         ])
 
     # SERIES
-    if action == "get_VOD-serie":
+    if action == "get_series":
 
         streams = (
             supabase.table("streams")
