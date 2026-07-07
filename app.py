@@ -154,8 +154,8 @@ def player_api():
         ])
 
     # SERIES CATEGORIES
-    if action == "get_series_categories":
-    
+   if action == "get_series_categories":
+
         categorias = (
             supabase.table("categorias")
             .select("*")
@@ -163,7 +163,7 @@ def player_api():
             .eq("ativo", True)
             .execute()
         )
-    
+
         return jsonify([
             {
                 "category_id": str(c["id"]),
@@ -173,7 +173,7 @@ def player_api():
         ])
 
     # SERIES
-    if action == "get_series":
+    if action == "get_series_streams":
 
         streams = (
             supabase.table("streams")
@@ -185,14 +185,16 @@ def player_api():
 
         return jsonify([
             {
-                "series_id": s["id"],
+                "stream_id": s["id"],
                 "name": s["nome"],
-                "cover": s.get("capa", "") or "",
-                "category_id": str(s["categoria_id"])
+                "stream_icon": s.get("capa", "") or "",
+                "category_id": str(s["categoria_id"]),
+                "container_extension": "mp4",
+                "direct_source": s["url_stream"]
             }
             for s in streams.data
         ])
-
+        
     return jsonify([])
 
 
