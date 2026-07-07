@@ -255,11 +255,28 @@ def get_m3u():
             "OUTROS"
         )
 
+        
+        if s["tipo"] == "MOVIE":
+            grupo = f"Filmes | {categoria}"
+    
+        elif s["tipo"] == "SERIES":
+            grupo = f"Series | {categoria}"
+    
+        else:
+            grupo = categoria
+    
+        logo = (
+            s.get("capa")
+            or s.get("logo")
+            or ""
+        )
+
+
         m3u += (
             f'#EXTINF:-1 '
             f'tvg-name="{s["nome"]}" '
             f'tvg-logo="{s.get("logo", "")}" '
-            f'group-title="{categoria}",'
+            f'group-title="{grupo}",'
             f'{s["nome"]}\n'
             f'{s["url_stream"]}\n'
         )
