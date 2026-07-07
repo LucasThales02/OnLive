@@ -20,7 +20,7 @@ def player_api():
 
     username = request.args.get("username")
     password = request.args.get("password")
-    action = request.args.get("action")
+    action = request.args.get("action", "").lower()
 
     cliente = (
         supabase.table("clientes")
