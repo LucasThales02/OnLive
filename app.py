@@ -185,12 +185,12 @@ def player_api():
 
         return jsonify([
             {
-                "stream_id": s["id"],
-                "name": s["nome"],
-                "stream_icon": s.get("capa", "") or "",
-                "category_id": str(s["categoria_id"]),
-                "container_extension": "mp4",
-                "direct_source": s["url_stream"]
+
+            "series_id": s["id"],
+            "name": s["nome"],
+            "cover": s.get("capa", "") or "",
+            "category_id": str(s["categoria_id"])
+
             }
             for s in streams.data
         ])
