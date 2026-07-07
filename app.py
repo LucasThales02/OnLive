@@ -44,34 +44,34 @@ def player_api():
     # LOGIN
     if action == "":
 
-    return jsonify({
-        "user_info": {
-            "auth": 1,
-            "status": "Active",
-            "username": cliente["usuario"],
-            "password": cliente["senha"],
-            "message": "",
-            "exp_date": "2145916800",
-            "is_trial": "0",
-            "active_cons": "1",
-            "created_at": "1710000000",
-            "max_connections": str(
-                cliente.get("max_connections", 1)
-            ),
-            "allowed_output_formats": [
-                "ts",
-                "m3u8"
-            ]
-        },
-        "server_info": {
-            "url": "onlive-yi4x.onrender.com",
-            "port": "443",
-            "https_port": "443",
-            "server_protocol": "https",
-            "rtmp_port": "443",
-            "timezone": "America/Sao_Paulo",
-            "timestamp_now": "1710000000"
-        }
+        return jsonify({
+            "user_info": {
+                "auth": 1,
+                "status": "Active",
+                "username": cliente["usuario"],
+                "password": cliente["senha"],
+                "message": "",
+                "exp_date": "2145916800",
+                "is_trial": "0",
+                "active_cons": "1",
+                "created_at": "1710000000",
+                "max_connections": str(
+                    cliente.get("max_connections", 1)
+                ),
+                "allowed_output_formats": [
+                    "ts",
+                    "m3u8"
+                ]
+            },
+            "server_info": {
+                "url": "onlive-yi4x.onrender.com",
+                "port": "443",
+                "https_port": "443",
+                "server_protocol": "https",
+                "rtmp_port": "443",
+                "timezone": "America/Sao_Paulo",
+                "timestamp_now": "1710000000"
+            }
     })
     
     # LIVE CATEGORIES
