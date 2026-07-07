@@ -42,7 +42,7 @@ def player_api():
     cliente = cliente.data[0]
 
     # LOGIN
-    if not action:
+    if action == "":
 
         return jsonify({
             "user_info": {
