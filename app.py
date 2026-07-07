@@ -241,7 +241,7 @@ def get_m3u():
     streams = (
         supabase.table("streams")
         .select("*")
-        .eq("tipo", "LIVE")
+        #.eq("tipo", "LIVE")
         .eq("ativo", True)
         .execute()
     )
