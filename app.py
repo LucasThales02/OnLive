@@ -154,7 +154,7 @@ def player_api():
         ])
 
     # SERIES CATEGORIES
-    if action == "get_series_categories":
+    if action == "get_serie_categories":
     
         categorias = (
             supabase.table("categorias")
@@ -174,7 +174,7 @@ def player_api():
         ])
 
     # SERIES
-    if action == "get_series":
+    if action == "get_serie":
 
         streams = (
             supabase.table("streams")
