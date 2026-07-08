@@ -9,6 +9,37 @@ supabase = create_client(
     os.environ["SUPABASE_KEY"]
 )
 
+def buscar_todos_streams(tipo=None):
+    todos = []
+    inicio = 0
+    lote = 1000
+
+    while True:
+        query = (
+            supabase.table("streams")
+            .select("*")
+            .eq("ativo", True)
+            .order("categoria_id")
+            .range(inicio, inicio + lote - 1)
+        )
+
+        if tipo:
+            query = query.eq("tipo", tipo)
+
+        resultado = query.execute()
+
+        if not resultado.data:
+            break
+
+        todos.extend(resultado.data)
+
+        if len(resultado.data) < lote:
+            break
+
+        inicio += lote
+
+    return todos
+
 
 @app.route("/")
 def home():
@@ -96,13 +127,7 @@ def player_api():
     # LIVE STREAMS
     if action == "get_live_streams":
 
-        streams = (
-            supabase.table("streams")
-            .select("*")
-            .eq("tipo", "LIVE")
-            .eq("ativo", True)
-            .execute()
-        )
+        streams = buscar_todos_streams("LIVE")
 
         return jsonify([
             {
@@ -114,7 +139,7 @@ def player_api():
                 "category_id": str(s["categoria_id"]),
                 "direct_source": s["url_stream"]
             }
-            for s in streams.data
+            for s in streams
         ])
 
     # MOVIE CATEGORIES
@@ -139,13 +164,7 @@ def player_api():
     # MOVIES
     if action == "get_vod_streams":
 
-        streams = (
-            supabase.table("streams")
-            .select("*")
-            .eq("tipo", "MOVIE")
-            .eq("ativo", True)
-            .execute()
-        )
+        streams = buscar_todos_streams("MOVIE")
 
         return jsonify([
             {
@@ -156,7 +175,7 @@ def player_api():
                 "container_extension": "mp4",
                 "direct_source": s["url_stream"]
             }
-            for s in streams.data
+            for s in streams
         ])
 
     # SERIES CATEGORIES
@@ -181,13 +200,7 @@ def player_api():
     # SERIES
     if action == "get_series":
 
-        streams = (
-            supabase.table("streams")
-            .select("*")
-            .eq("tipo", "SERIES")
-            .eq("ativo", True)
-            .execute()
-        )
+        streams = buscar_todos_streams("SERIES")
 
         return jsonify([
             {
@@ -196,7 +209,7 @@ def player_api():
                 "cover": s.get("capa", "") or "",
                 "category_id": str(s["categoria_id"])
             }
-            for s in streams.data
+            for s in streams
         ])
 
     return jsonify([])
@@ -239,17 +252,11 @@ def get_m3u():
         for c in categorias.data
     }
 
-    streams = (
-        supabase.table("streams")
-        .select("*")
-        .eq("ativo", True)
-        .order("categoria_id")
-        .execute()
-    )
+    streams = bus*ar_todos_streams()
 
     m3u = "#EXTM3U\n\n"
 
-    for s in streams.data:
+    for s in streams:
 
         categoria = str(
             mapa_categorias.get(
