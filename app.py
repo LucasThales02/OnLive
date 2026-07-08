@@ -230,6 +230,7 @@ def get_m3u():
     categorias = (
         supabase.table("categorias")
         .select("*")
+        .order("id")
         .execute()
     )
 
