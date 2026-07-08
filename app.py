@@ -243,6 +243,7 @@ def get_m3u():
         .select("*")
         #.eq("tipo", "LIVE")
         .eq("ativo", True)
+        .order("categoria_id")
         .execute()
     )
 
