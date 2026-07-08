@@ -252,7 +252,11 @@ def get_m3u():
         for c in categorias.data
     }
 
-    streams = bus*ar_todos_streams()
+
+    streams = buscar_todos_streams()
+
+    print(f"TOTAL DE STREAMS: {len(streams)}")
+
 
     m3u = "#EXTM3U\n\n"
 
