@@ -234,14 +234,13 @@ def get_m3u():
     )
 
     mapa_categorias = {
-        c["id"]: c["nome"]
+        c["id"]: str(c["nome"]).strip()
         for c in categorias.data
     }
 
     streams = (
         supabase.table("streams")
         .select("*")
-        #.eq("tipo", "LIVE")
         .eq("ativo", True)
         .order("categoria_id")
         .execute()
@@ -251,42 +250,45 @@ def get_m3u():
 
     for s in streams.data:
 
-        categoria = mapa_categorias.get(
-            s["categoria_id"],
-            "OUTROS"
-        )
+        categoria = str(
+            mapa_categorias.get(
+                s["categoria_id"],
+                "OUTROS"
+            )
+        ).strip()
 
-        
         if s["tipo"] == "MOVIE":
             grupo = f"Filmes | {categoria}"
-    
+
         elif s["tipo"] == "SERIES":
             grupo = f"Series | {categoria}"
-    
+
         else:
             grupo = categoria
-    
+
+        grupo = grupo.strip()
+
         logo = (
             s.get("capa")
             or s.get("logo")
             or ""
         )
 
-
         m3u += (
             f'#EXTINF:-1 '
             f'tvg-name="{s["nome"]}" '
-            f'tvg-logo="{s.get("logo", "")}" '
-            f'group-title="{grupo}",'
-            f'{s["nome"]}\n'
-            f'{s["url_stream"]}\n'
+            f'tvg-logo="{logo}" '
+            f'group-title="{grupo}",{s["nome"]}\n'
+            f'{s["url_stream"]}\n\n'
         )
 
     return Response(
         m3u,
-        mimetype="application/x-mpegURL"
+        mimetype="application/x-mpegURL",
+        headers={
+            "Content-Disposition": "attachment; filename=lista.m3u"
+        }
     )
-
 
 if __name__ == "__main__":
     app.run(
